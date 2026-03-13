@@ -1,5 +1,5 @@
 import styles from './textbox.module.scss';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { WebGAL } from '@/Core/WebGAL';
 import { ITextboxProps } from './types';
 import useApplyStyle from '@/hooks/useApplyStyle';
@@ -30,6 +30,8 @@ export default function IMSSTextbox(props: ITextboxProps) {
 
   const applyStyle = useApplyStyle('textbox');
 
+  const [isTextComplete, setIsTextComplete] = useState(false); // 是否打字完成
+
   useEffect(() => {
     function settleText() {
       const textElements = document.querySelectorAll('.Textelement_start');
@@ -37,6 +39,7 @@ export default function IMSSTextbox(props: ITextboxProps) {
       textArray.forEach((e) => {
         e.className = applyStyle('TextBox_textElement_Settled', styles.TextBox_textElement_Settled);
       });
+      setIsTextComplete(true);
     }
 
     WebGAL.events.textSettle.on(settleText);
@@ -44,6 +47,11 @@ export default function IMSSTextbox(props: ITextboxProps) {
       WebGAL.events.textSettle.off(settleText);
     };
   }, []);
+
+  useEffect(() => {
+    setIsTextComplete(false);
+  }, [currentDialogKey]);
+
   let allTextIndex = 0;
   const nameElementList = showName.map((line, index) => {
     const textline = line.map((en, index) => {
@@ -267,6 +275,8 @@ export default function IMSSTextbox(props: ITextboxProps) {
             >
               {textElementList}
             </div>
+            {/* 闪动图标 */}
+            {isTextComplete && <span className={styles.textEndIcon}>▼</span>}
           </div>
         </div>
       )}
